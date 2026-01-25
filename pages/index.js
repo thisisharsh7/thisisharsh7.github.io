@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FaFile, FaFolder, FaFilePdf, FaCode, FaTerminal } from 'react-icons/fa';
@@ -16,6 +16,7 @@ export default function Desktop() {
   const [mouseY, setMouseY] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
+  const hasAutoOpened = useRef(false);
 
   // Helper function to get file icon
   const getFileIcon = (item, size = 32) => {
@@ -51,12 +52,16 @@ export default function Desktop() {
 
   // Auto-open key files on initial load (desktop only)
   useEffect(() => {
-    // Only run once on mount
+    // Prevent running more than once
+    if (hasAutoOpened.current) return;
     if (typeof window === 'undefined') return;
 
     // Only auto-open on desktop, not mobile/tablet
     const isDesktop = window.innerWidth >= 1024;
     if (!isDesktop) return;
+
+    // Mark as opened immediately to prevent re-runs
+    hasAutoOpened.current = true;
 
     // Open README.txt - positioned left
     const readmeFile = filesystem.children.find(f => f.name === 'README.txt');
