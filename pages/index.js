@@ -51,34 +51,31 @@ export default function Desktop() {
 
   // Auto-open key files on initial load (desktop only)
   useEffect(() => {
-    // Only auto-open on desktop, not mobile/tablet, and only if no windows are open
-    if (typeof window !== 'undefined' && window.innerWidth >= 1024 && openWindows.length === 0) {
-      const hasAutoOpened = sessionStorage.getItem('hasAutoOpened');
+    // Only run once on mount
+    if (typeof window === 'undefined') return;
 
-      if (!hasAutoOpened) {
-        // Mark as auto-opened to prevent re-opening on navigation
-        sessionStorage.setItem('hasAutoOpened', 'true');
+    // Only auto-open on desktop, not mobile/tablet
+    const isDesktop = window.innerWidth >= 1024;
+    if (!isDesktop) return;
 
-        // Open README.txt - positioned left
-        const readmeFile = filesystem.children.find(f => f.name === 'README.txt');
-        if (readmeFile) {
-          setTimeout(() => handleFileOpen(readmeFile, 120, 90), 100);
-        }
-
-        // Open now.md - positioned center-right
-        const nowFile = filesystem.children.find(f => f.name === 'now.md');
-        if (nowFile) {
-          setTimeout(() => handleFileOpen(nowFile, 480, 120), 300);
-        }
-
-        // Open projects folder - positioned right
-        const projectsFolder = filesystem.children.find(f => f.name === 'projects');
-        if (projectsFolder) {
-          setTimeout(() => handleFileOpen(projectsFolder, 840, 150), 500);
-        }
-      }
+    // Open README.txt - positioned left
+    const readmeFile = filesystem.children.find(f => f.name === 'README.txt');
+    if (readmeFile) {
+      setTimeout(() => handleFileOpen(readmeFile, 120, 90), 100);
     }
-  }, [isMobile, isTablet]); // Re-run if screen size changes
+
+    // Open now.md - positioned center-right
+    const nowFile = filesystem.children.find(f => f.name === 'now.md');
+    if (nowFile) {
+      setTimeout(() => handleFileOpen(nowFile, 480, 120), 300);
+    }
+
+    // Open projects folder - positioned right
+    const projectsFolder = filesystem.children.find(f => f.name === 'projects');
+    if (projectsFolder) {
+      setTimeout(() => handleFileOpen(projectsFolder, 840, 150), 500);
+    }
+  }, []); // Empty array - only run once on mount
 
   // Track mouse position for auto-hiding menu bar
   useEffect(() => {
