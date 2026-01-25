@@ -1,258 +1,461 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { FaFolder, FaFileAlt, FaDownload, FaEnvelope, FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import Image from 'next/image';
+import { AnimatePresence, motion } from 'framer-motion';
+import { FaFile, FaFolder, FaFilePdf, FaCode, FaTerminal } from 'react-icons/fa';
+import MenuBar from '../components/MenuBar';
+import FileIcon from '../components/FileIcon';
+import Window from '../components/Window';
+import WindowContent from '../components/WindowContent';
+import Toolbar from '../components/Toolbar';
+import { filesystem } from '../constants/filesystem';
 
-const files = [
-  {
-    name: 'About Me',
-    path: '/about',
-    icon: <FaFileAlt aria-label="About Icon" />,
-    color: 'text-blue-200',
-    description: 'Get to know my background, values, and skills',
-  },
-  {
-    name: 'Experience',
-    path: '/experience',
-    icon: <FaFolder aria-label="Experience Icon" />,
-    color: 'text-purple-200',
-    description: 'Browse my journey through startups & clients',
-    highlight: true,
-  },
-  {
-    name: 'Projects',
-    path: '/projects',
-    icon: <FaFolder aria-label="Projects Icon" />,
-    color: 'text-cyan-200',
-    description: 'Explore a curated list of frontend builds',
-  },
-  {
-    name: 'Achievements',
-    path: '/achievements',
-    icon: <FaFolder aria-label="Achievements Icon" />,
-    color: 'text-green-200',
-    description: 'Awards and recognitions earned along the way',
-  },
-  {
-    name: 'Full Portfolio',
-    path: '/all',
-    icon: <FaFolder aria-label="All Sections Icon" />,
-    color: 'text-yellow-200',
-    description: 'See everything in one immersive view',
-    highlight: true,
-  },
-];
+export default function Desktop() {
+  const [openWindows, setOpenWindows] = useState([]);
+  const [windowZIndex, setWindowZIndex] = useState(10);
+  const [iconPositions, setIconPositions] = useState({});
+  const [mouseY, setMouseY] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
 
-const isReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Helper function to get file icon
+  const getFileIcon = (item, size = 32) => {
+    if (item.type === 'folder') {
+      return <FaFolder className="text-orange-500" size={size} />;
+    }
+    if (item.name.endsWith('.pdf')) {
+      return <FaFilePdf className="text-red-600" size={size} />;
+    }
+    if (item.name.endsWith('.sh')) {
+      return <FaTerminal className="text-green-700" size={size} />;
+    }
+    if (item.name.endsWith('.md')) {
+      return <FaCode className="text-stone-600" size={size} />;
+    }
+    if (item.name.endsWith('.txt')) {
+      return <FaFile className="text-stone-500" size={size} />;
+    }
+    return <FaFile className="text-stone-600" size={size} />;
+  };
 
-export default function Home() {
-  const [activeCard, setActiveCard] = useState(null);
-  const nameWords = ['Hi,', "I'm", 'Harsh'];
-  const titleWords = 'Full-Stack Developer | Open Source Maintainer'.split(' ');
+  // Detect screen size
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
+    };
 
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  // Auto-open key files on initial load (desktop only)
+  useEffect(() => {
+    // Only auto-open on desktop, not mobile/tablet, and only if no windows are open
+    if (typeof window !== 'undefined' && window.innerWidth >= 1024 && openWindows.length === 0) {
+      const hasAutoOpened = sessionStorage.getItem('hasAutoOpened');
+
+      if (!hasAutoOpened) {
+        // Mark as auto-opened to prevent re-opening on navigation
+        sessionStorage.setItem('hasAutoOpened', 'true');
+
+        // Open README.txt - positioned left
+        const readmeFile = filesystem.children.find(f => f.name === 'README.txt');
+        if (readmeFile) {
+          setTimeout(() => handleFileOpen(readmeFile, 120, 90), 100);
+        }
+
+        // Open now.md - positioned center-right
+        const nowFile = filesystem.children.find(f => f.name === 'now.md');
+        if (nowFile) {
+          setTimeout(() => handleFileOpen(nowFile, 480, 120), 300);
+        }
+
+        // Open projects folder - positioned right
+        const projectsFolder = filesystem.children.find(f => f.name === 'projects');
+        if (projectsFolder) {
+          setTimeout(() => handleFileOpen(projectsFolder, 840, 150), 500);
+        }
+      }
+    }
+  }, [isMobile, isTablet]); // Re-run if screen size changes
+
+  // Track mouse position for auto-hiding menu bar
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMouseY(e.clientY);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  const handleFileOpen = (file, x = 100, y = 100) => {
+    const existingWindow = openWindows.find(w => w.file.name === file.name);
+
+    if (existingWindow) {
+      if (existingWindow.minimized) {
+        handleWindowRestore(existingWindow.id);
+      } else {
+        handleWindowFocus(existingWindow.id);
+      }
+      return;
+    }
+
+    const newWindow = {
+      id: Date.now(),
+      file,
+      x: x + openWindows.length * 30,
+      y: y + openWindows.length * 30,
+      zIndex: windowZIndex + 1,
+      minimized: false,
+      maximized: false,
+      originalSize: null
+    };
+
+    setOpenWindows([...openWindows, newWindow]);
+    setWindowZIndex(windowZIndex + 1);
+  };
+
+  const handleWindowClose = (windowId) => {
+    setOpenWindows(openWindows.filter(w => w.id !== windowId));
+  };
+
+  const handleWindowFocus = (windowId) => {
+    const newZIndex = windowZIndex + 1;
+    setOpenWindows(openWindows.map(w =>
+      w.id === windowId ? { ...w, zIndex: newZIndex } : w
+    ));
+    setWindowZIndex(newZIndex);
+  };
+
+  const handleWindowMinimize = (windowId) => {
+    setOpenWindows(openWindows.map(w =>
+      w.id === windowId ? { ...w, minimized: true } : w
+    ));
+  };
+
+  const handleWindowRestore = (windowId) => {
+    const newZIndex = windowZIndex + 1;
+    setOpenWindows(openWindows.map(w =>
+      w.id === windowId ? { ...w, minimized: false, zIndex: newZIndex } : w
+    ));
+    setWindowZIndex(newZIndex);
+  };
+
+  const handleWindowMaximize = (windowId) => {
+    setOpenWindows(openWindows.map(w => {
+      if (w.id === windowId) {
+        if (w.maximized) {
+          // Restore to original size
+          return {
+            ...w,
+            maximized: false,
+            ...(w.originalSize || {})
+          };
+        } else {
+          // Save current size and maximize
+          return {
+            ...w,
+            maximized: true,
+            originalSize: {
+              x: w.x,
+              y: w.y,
+              width: w.width,
+              height: w.height
+            }
+          };
+        }
+      }
+      return w;
+    }));
+  };
+
+  const handleWindowResize = (windowId, width, height) => {
+    setOpenWindows(openWindows.map(w =>
+      w.id === windowId ? { ...w, width, height } : w
+    ));
+  };
+
+  const handleIconDrag = (name, position) => {
+    setIconPositions(prev => ({
+      ...prev,
+      [name]: position
+    }));
+  };
+
+  // Mobile card view
+  if (isMobile) {
+    return (
+      <>
+        <Head>
+          <title>Harsh Kumar</title>
+          <meta name="description" content="I build software for the web. Currently working on Epicenter and Cognee." />
+          <meta name="keywords" content="Harsh Kumar, Software Engineer, Full-Stack Developer, React, Next.js, Node.js, TypeScript, Python" />
+          <link rel="canonical" href="https://dev-harsh.vercel.app/" />
+          <meta property="og:title" content="Harsh Kumar" />
+          <meta property="og:description" content="I build software for the web. Currently working on Epicenter and Cognee." />
+          <meta property="og:url" content="https://dev-harsh.vercel.app/" />
+          <meta name="twitter:title" content="Harsh Kumar" />
+          <meta name="twitter:description" content="I build software for the web." />
+        </Head>
+
+        <div className="h-screen w-screen overflow-y-auto overflow-x-hidden bg-stone-50 font-sans">
+          {/* Mobile Header */}
+          <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-stone-200 px-4 py-3">
+            <h1 className="text-lg font-semibold text-stone-800">Harsh Kumar</h1>
+          </div>
+
+          {/* Mobile Content - Cards with bottom padding for toolbar */}
+          <div className="p-4 space-y-3 pb-20">
+            {filesystem.children.map((item) => (
+              <button
+                key={item.name}
+                onClick={() => handleFileOpen(item)}
+                className="w-full bg-white rounded-xl p-4 shadow-sm border border-stone-200 hover:shadow-md transition-all text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex-shrink-0">
+                    {getFileIcon(item, 32)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-stone-800">{item.name}</div>
+                    {item.size && <div className="text-xs text-stone-500 mt-0.5">{item.size}</div>}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* Mobile Window - Full Screen */}
+          <AnimatePresence>
+            {openWindows.filter(w => !w.minimized).map((win) => (
+              <motion.div
+                key={win.id}
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="fixed inset-0 z-50 bg-white flex flex-col"
+              >
+                {/* Mobile Window Header */}
+                <div className="sticky top-0 bg-white border-b border-stone-200 px-4 py-3 flex items-center justify-between">
+                  <h2 className="text-base font-medium text-stone-800">{win.file.name}</h2>
+                  <div className="flex items-center gap-2">
+                    {win.file.isPDF && (
+                      <a
+                        href="/doc/HARSH_KUMAR_2026_resume.pdf"
+                        download="Harsh_Kumar_Resume.pdf"
+                        className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center hover:bg-orange-200 transition-colors text-orange-600"
+                        title="Download PDF"
+                      >
+                        ↓
+                      </a>
+                    )}
+                    <button
+                      onClick={() => handleWindowClose(win.id)}
+                      className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center hover:bg-stone-200 transition-colors"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+
+                {/* Mobile Window Content */}
+                <div className="flex-1 overflow-auto">
+                  <WindowContent
+                    file={win.file}
+                    onFileOpen={(file) => handleFileOpen(file)}
+                  />
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+
+          {/* Mobile Toolbar */}
+          <Toolbar
+            openWindows={openWindows}
+            onWindowRestore={handleWindowRestore}
+            onWindowFocus={handleWindowFocus}
+            activeWindowId={openWindows.find(w => !w.minimized && w.zIndex === Math.max(...openWindows.map(win => win.zIndex)))?.id}
+            isMobile={true}
+          />
+        </div>
+      </>
+    );
+  }
+
+  // Desktop & Tablet view
   return (
     <>
       <Head>
-        <title>Harsh Kumar | Full-Stack Developer - React, Next.js, Node.js</title>
-        <meta name="description" content="Full-Stack Developer with 2+ years of experience building scalable web applications using React, Next.js, and Node.js. Currently sponsored open source maintainer at YC-backed Epicenter (YC S25)." />
-        <meta name="keywords" content="Harsh Kumar, Full-Stack Developer, React Developer, Next.js, TypeScript, Node.js, Tailwind CSS, Firebase, MongoDB, AI Integration, WebRTC, Software Engineer, YC S25, Open Source Maintainer, Epicenter, Frontend Developer, Web Developer" />
+        <title>Harsh Kumar</title>
+        <meta name="description" content="I build software for the web. Currently working on Epicenter and Cognee." />
+        <meta name="keywords" content="Harsh Kumar, Software Engineer, Full-Stack Developer, React, Next.js, Node.js, TypeScript, Python" />
         <link rel="canonical" href="https://dev-harsh.vercel.app/" />
-        <meta property="og:title" content="Harsh Kumar | Full-Stack Developer - React, Next.js, Node.js" />
-        <meta property="og:description" content="Full-Stack Developer with 2+ years of experience. Currently sponsored open source maintainer at YC-backed Epicenter (YC S25)." />
-        <meta property="og:image" content="/images/og-image.jpg" />
-        <meta property="og:image:alt" content="Harsh's portfolio preview" />
+        <meta property="og:title" content="Harsh Kumar" />
+        <meta property="og:description" content="I build software for the web. Currently working on Epicenter and Cognee." />
         <meta property="og:url" content="https://dev-harsh.vercel.app/" />
-        <meta name="twitter:image" content="/images/og-image.jpg" />
-        <meta name="twitter:image:alt" content="Harsh's portfolio preview" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Person',
-              'name': 'Harsh Kumar',
-              'jobTitle': 'Full-Stack Developer | Open Source Maintainer',
-              'url': 'https://dev-harsh.vercel.app',
-              'sameAs': [
-                'https://github.com/thisisharsh7',
-                'https://linkedin.com/in/thisisharsh7',
-                'https://twitter.com/thisisharsh7',
-              ],
-              'image': 'https://dev-harsh.vercel.app/images/Harsh_Profile_Pic.jpg',
-            }),
-          }}
-        />
+        <meta name="twitter:title" content="Harsh Kumar" />
+        <meta name="twitter:description" content="I build software for the web." />
       </Head>
 
-      <motion.section
-        className="flex flex-col relative items-center min-h-screen justify-center  w-full sm:pt-12 pt-8 pb-24"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        role="main"
-        aria-label="Portfolio Home page"
-      >
-        <motion.div className="flex flex-col items-center mb-6">
-          {/* <motion.div
-            className="mb-4 sm:mb-6"
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <Image
-              src="/images/Harsh_Profile_Pic.jpg"
-              alt="Harsh's Profile"
-              width={120}
-              height={120}
-              className="rounded-full border-4 border-blue-500 shadow-lg object-contain"
-              priority
-            />
-          </motion.div> */}
+      <div className="h-screen w-screen overflow-hidden font-sans select-none">
+        <MenuBar
+          mouseY={mouseY}
+        />
 
-          <motion.div
-            className="text-2xl sm:text-3xl md:text-4xl font-bold text-center leading-tight mb-3 sm:mb-4"
-            initial="hidden"
-            animate="visible"
-            transition={{ staggerChildren: 0.1 }}
-          >
-            {nameWords.map((word, idx) => (
-              <motion.span
-                key={idx}
-                className={`inline-block mr-2 ${idx === 2 ? 'text-blue-400' : 'text-white'} drop-shadow-sm`}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 + idx * 0.1 }}
-              >
-                {word}
-              </motion.span>
-            ))}
-          </motion.div>
+        {/* Desktop Area */}
+        <div className="pt-6 h-full relative">
+          {/* Desktop Icons - Only show on desktop, not tablet */}
+          {!isTablet && (
+            <div className="relative h-full p-4">
+              {filesystem.children.map((item, index) => {
+                const defaultPos = item.desktopPosition || { x: 20, y: 20 + index * 80 };
+                const pos = iconPositions[item.name] || defaultPos;
+                return (
+                  <FileIcon
+                    key={item.name}
+                    name={item.name}
+                    type={item.type}
+                    x={pos.x}
+                    y={pos.y}
+                    onClick={() => handleFileOpen(item, 120 + index * 35, 90 + index * 28)}
+                    onDrag={handleIconDrag}
+                  />
+                );
+              })}
+            </div>
+          )}
 
-          <motion.h2
-            className="text-lg sm:text-xl md:text-2xl font-semibold text-center leading-tight tracking-tight max-w-4xl mb-2"
-            initial="hidden"
-            animate="visible"
-            transition={{ staggerChildren: 0.05 }}
-          >
-            {titleWords.map((word, idx) => (
-              <motion.span
-                key={idx}
-                className="inline-block mr-2 text-gray-300 drop-shadow-sm"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.8 + idx * 0.05 }}
-              >
-                {word}
-              </motion.span>
-            ))}
-          </motion.h2>
-        </motion.div>
-
-        <motion.p
-          className="max-w-xl text-center text-sm sm:text-base text-blue-100/90"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
-        >
-          Full-Stack Developer with 2+ years of experience building scalable web applications using React, Next.js, and Node.js. Currently sponsored open source maintainer at YC-backed company.
-        </motion.p>
-
-        <motion.div
-          className="mt-6 flex items-center gap-3"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9 }}
-        >
-          <a
-            href="/doc/Harsh_Resume.pdf"
-            download
-            className="flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-gray-900"
-            aria-label="Download Harsh's resume"
-          >
-            <FaDownload />
-            <span>Resume</span>
-          </a>
-          <a
-            href="mailto:9u.harsh@gmail.com"
-            className="flex items-center gap-2 rounded-full bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-gray-900"
-            aria-label="Contact Harsh via email"
-          >
-            <FaEnvelope />
-            <span>Contact</span>
-          </a>
-        </motion.div>
-
-        <motion.div
-          className="mt-6 flex justify-center gap-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.0, duration: 0.6 }}
-        >
-          <motion.a
-            href="https://github.com/thisisharsh7"
-            target="_blank"
-            rel="noopener noreferrer"
-            whileHover={isReducedMotion ? {} : { scale: 1.2, y: -2 }}
-            whileTap={isReducedMotion ? {} : { scale: 0.9 }}
-            className="text-2xl text-gray-400 hover:text-white transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-gray-900 rounded-full p-2"
-            aria-label="Visit Harsh's GitHub profile"
-          >
-            <FaGithub />
-          </motion.a>
-          <motion.a
-            href="https://linkedin.com/in/thisisharsh7"
-            target="_blank"
-            rel="noopener noreferrer"
-            whileHover={isReducedMotion ? {} : { scale: 1.2, y: -2 }}
-            whileTap={isReducedMotion ? {} : { scale: 0.9 }}
-            className="text-2xl text-gray-400 hover:text-blue-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-gray-900 rounded-full p-2"
-            aria-label="Visit Harsh's LinkedIn profile"
-          >
-            <FaLinkedin />
-          </motion.a>
-          <motion.a
-            href="https://twitter.com/thisisharsh7"
-            target="_blank"
-            rel="noopener noreferrer"
-            whileHover={isReducedMotion ? {} : { scale: 1.2, y: -2 }}
-            whileTap={isReducedMotion ? {} : { scale: 0.9 }}
-            className="text-2xl text-gray-400 hover:text-blue-300 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-gray-900 rounded-full p-2"
-            aria-label="Visit Harsh's Twitter profile"
-          >
-            <FaTwitter />
-          </motion.a>
-        </motion.div>
-
-
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-10 w-full max-w-[80rem] px-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.0 }}
-        >
-          {files.map(({ name, path, icon, color, description, highlight }, idx) => (
-            <Link key={idx} href={path} passHref>
-              <motion.a
-                onClick={() => setActiveCard(idx)}
-                className={`group relative flex flex-col items-center justify-center rounded-xl bg-gray-800 bg-opacity-90 border ${highlight ? 'border-blue-400' : 'border-gray-600'} shadow-md hover:bg-blue-700/30 transition-all duration-200 p-5 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-gray-900`}
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                aria-label={`Navigate to ${name} page`}
-              >
-                <div
-                  className={`text-3xl mb-3 p-3 rounded-full bg-gradient-to-br from-blue-700 via-blue-800 to-cyan-700 text-white shadow ${color}`}
-                >
-                  {icon}
+          {/* Tablet - Show launcher grid */}
+          {isTablet && (
+            <div className="h-full overflow-auto p-8">
+              <div className="max-w-2xl mx-auto">
+                <h2 className="text-2xl font-semibold text-stone-800 mb-6">Harsh Kumar</h2>
+                <div className="grid grid-cols-3 gap-4">
+                  {filesystem.children.map((item) => (
+                    <button
+                      key={item.name}
+                      onClick={() => handleFileOpen(item)}
+                      className="bg-white rounded-xl p-6 shadow-sm border border-stone-200 hover:shadow-md transition-all"
+                    >
+                      <div className="mb-3 flex justify-center">
+                        {getFileIcon(item, 48)}
+                      </div>
+                      <div className="font-medium text-stone-800 text-sm">{item.name}</div>
+                      {item.size && <div className="text-xs text-stone-500 mt-1">{item.size}</div>}
+                    </button>
+                  ))}
                 </div>
-                <span className="text-base font-semibold text-white text-center">{name}</span>
-                <span className="mt-2 text-xs text-center text-gray-300">{description}</span>
-              </motion.a>
-            </Link>
-          ))}
-        </motion.div>
-      </motion.section>
+              </div>
+            </div>
+          )}
+
+          {/* Windows */}
+          <AnimatePresence>
+            {openWindows.map((win) => {
+              // Determine window size based on screen size
+              const getResponsiveWindowSize = () => {
+                if (typeof window === 'undefined') return { width: 800, height: 600 };
+
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+
+                if (win.maximized) {
+                  return { width: screenWidth, height: screenHeight };
+                }
+
+                // Large screens (1920px+): Bigger default windows
+                if (screenWidth >= 1920) {
+                  return {
+                    width: win.width || (win.file.type === 'folder' ? 900 : 1000),
+                    height: win.height || (win.file.type === 'folder' ? 650 : 750)
+                  };
+                }
+
+                // Desktop (1440px-1919px): Standard large
+                if (screenWidth >= 1440) {
+                  return {
+                    width: win.width || (win.file.type === 'folder' ? 800 : 900),
+                    height: win.height || (win.file.type === 'folder' ? 600 : 700)
+                  };
+                }
+
+                // Desktop (1024px-1439px): Standard
+                if (screenWidth >= 1024) {
+                  return {
+                    width: win.width || (win.file.type === 'folder' ? 700 : 800),
+                    height: win.height || (win.file.type === 'folder' ? 500 : 600)
+                  };
+                }
+
+                // Tablet (768px-1023px): Smaller windows, centered
+                return {
+                  width: Math.min(screenWidth - 40, win.width || 600),
+                  height: Math.min(screenHeight - 100, win.height || 500)
+                };
+              };
+
+              const { width, height } = getResponsiveWindowSize();
+
+              // Position windows - center on tablet, normal on desktop
+              const getResponsivePosition = () => {
+                if (typeof window === 'undefined') return { x: 100, y: 100 };
+
+                if (win.maximized) return { x: 0, y: 0 };
+
+                // Tablet: Center windows
+                if (isTablet) {
+                  return {
+                    x: (window.innerWidth - width) / 2,
+                    y: (window.innerHeight - height) / 2
+                  };
+                }
+
+                return { x: win.x, y: win.y };
+              };
+
+              const { x, y } = getResponsivePosition();
+
+              return (
+                <Window
+                  key={win.id}
+                  title={win.file.name}
+                  initialX={x}
+                  initialY={y}
+                  width={width}
+                  height={height}
+                  zIndex={win.maximized ? 45 : win.zIndex}
+                  onClose={() => handleWindowClose(win.id)}
+                  onFocus={() => handleWindowFocus(win.id)}
+                  onMinimize={() => handleWindowMinimize(win.id)}
+                  onMaximize={() => handleWindowMaximize(win.id)}
+                  onResize={(width, height) => handleWindowResize(win.id, width, height)}
+                  terminal={win.file.terminal}
+                  fileMetadata={win.file}
+                  minimized={win.minimized}
+                  maximized={win.maximized}
+                  isTablet={isTablet}
+                >
+                  <WindowContent
+                    file={win.file}
+                    onFileOpen={(file) => handleFileOpen(file, win.x + 50, win.y + 50)}
+                  />
+                </Window>
+              );
+            })}
+          </AnimatePresence>
+        </div>
+
+        {/* Bottom Toolbar */}
+        <Toolbar
+          openWindows={openWindows}
+          onWindowRestore={handleWindowRestore}
+          onWindowFocus={handleWindowFocus}
+          activeWindowId={openWindows.find(w => !w.minimized && w.zIndex === Math.max(...openWindows.map(win => win.zIndex)))?.id}
+        />
+      </div>
     </>
   );
 }
