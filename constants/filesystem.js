@@ -47,12 +47,12 @@ export const filesystem = {
 <p class="mb-4"><strong>Cognee</strong><br/>
 <span class="text-sm text-stone-500">Dec 2025 – Present</span></p>
 
-<p class="mb-8">Developer support and community. I help developers solve problems. Onboard new users. Answer technical questions. Build documentation. Make the community work.</p>
+<p class="mb-8">Moderator. I talk with developers. Figure out what they need. Answer technical questions. Share feedback with the team. Suggest fixes.</p>
 
 <p class="mb-4"><strong>Epicenter (YC S25)</strong><br/>
 <span class="text-sm text-stone-500">Aug 2025 – Present</span></p>
 
-<p class="mb-8">Open source maintainer. I track issues. Submit PRs for documentation, UI fixes, workflow improvements. Help shape what gets built next. Organize the roadmap. Share tools and ideas with the team.</p>
+<p class="mb-8">Maintainer. I build UI. Submit PRs. Work with the team on features and fixes. Help shape the roadmap. Suggest improvements.</p>
 
 <h3 class="text-lg font-medium mb-6 text-stone-800 mt-10">Previously</h3>
 
