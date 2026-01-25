@@ -63,23 +63,57 @@ export default function Desktop() {
     // Mark as opened immediately to prevent re-runs
     hasAutoOpened.current = true;
 
-    // Open README.txt - positioned left
-    const readmeFile = filesystem.children.find(f => f.name === 'README.txt');
-    if (readmeFile) {
-      setTimeout(() => handleFileOpen(readmeFile, 120, 90), 100);
-    }
+    // Create all windows at once to avoid race conditions
+    setTimeout(() => {
+      const readmeFile = filesystem.children.find(f => f.name === 'README.txt');
+      const nowFile = filesystem.children.find(f => f.name === 'now.md');
+      const projectsFolder = filesystem.children.find(f => f.name === 'projects');
 
-    // Open now.md - positioned center-right
-    const nowFile = filesystem.children.find(f => f.name === 'now.md');
-    if (nowFile) {
-      setTimeout(() => handleFileOpen(nowFile, 480, 120), 300);
-    }
+      const initialWindows = [];
+      let zIndex = 11;
 
-    // Open projects folder - positioned right
-    const projectsFolder = filesystem.children.find(f => f.name === 'projects');
-    if (projectsFolder) {
-      setTimeout(() => handleFileOpen(projectsFolder, 840, 150), 500);
-    }
+      if (readmeFile) {
+        initialWindows.push({
+          id: Date.now(),
+          file: readmeFile,
+          x: 120,
+          y: 90,
+          zIndex: zIndex++,
+          minimized: false,
+          maximized: false,
+          originalSize: null
+        });
+      }
+
+      if (nowFile) {
+        initialWindows.push({
+          id: Date.now() + 1,
+          file: nowFile,
+          x: 480,
+          y: 120,
+          zIndex: zIndex++,
+          minimized: false,
+          maximized: false,
+          originalSize: null
+        });
+      }
+
+      if (projectsFolder) {
+        initialWindows.push({
+          id: Date.now() + 2,
+          file: projectsFolder,
+          x: 840,
+          y: 150,
+          zIndex: zIndex++,
+          minimized: false,
+          maximized: false,
+          originalSize: null
+        });
+      }
+
+      setOpenWindows(initialWindows);
+      setWindowZIndex(zIndex);
+    }, 100);
   }, []); // Empty array - only run once on mount
 
   // Track mouse position for auto-hiding menu bar
