@@ -1,4 +1,4 @@
 module.exports = {
-    siteUrl: 'https://dev-harsh.vercel.app',
+    siteUrl: 'https://thisisharsh7.github.io',
     generateRobotsTxt: true,
 };
