@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FaTimes, FaMinus, FaExpand, FaCompress, FaDownload, FaShareAlt } from 'react-icons/fa';
+import { getMenuBarHeight } from '../utils/constants';
 
 export default function Window({
   title,
@@ -32,41 +33,41 @@ export default function Window({
   const windowRef = useRef(null);
   const [controlSize, setControlSize] = useState({ button: 'w-3 h-3', icon: 6 });
   const [uiScale, setUiScale] = useState({
-    titleBar: 'h-10',
-    titleText: 'text-sm',
-    terminalBar: 'h-8',
+    titleBar: 'h-6',
+    titleText: 'text-xs',
+    terminalBar: 'h-6',
     terminalText: 'text-xs'
   });
 
-  // Scale window UI based on screen size
+  // Scale window UI based on screen size - match MenuBar heights
   useEffect(() => {
     const updateUIScale = () => {
       const width = typeof window !== 'undefined' ? window.innerWidth : 1024;
       if (width >= 2560) {
-        // 4K+
+        // 4K+ - Match MenuBar h-8 (32px), text-sm
         setControlSize({ button: 'w-4 h-4', icon: 8 });
         setUiScale({
-          titleBar: 'h-12',
-          titleText: 'text-base',
-          terminalBar: 'h-10',
+          titleBar: 'h-8',
+          titleText: 'text-sm',
+          terminalBar: 'h-8',
           terminalText: 'text-sm'
         });
       } else if (width >= 1920) {
-        // Large desktop
+        // Large desktop - Match MenuBar h-7 (28px), text-sm for readability
         setControlSize({ button: 'w-3.5 h-3.5', icon: 7 });
         setUiScale({
-          titleBar: 'h-11',
+          titleBar: 'h-7',
           titleText: 'text-sm',
-          terminalBar: 'h-9',
-          terminalText: 'text-xs'
+          terminalBar: 'h-7',
+          terminalText: 'text-sm'
         });
       } else {
-        // Standard
+        // Standard - Match MenuBar h-6 (24px), text-xs
         setControlSize({ button: 'w-3 h-3', icon: 6 });
         setUiScale({
-          titleBar: 'h-10',
-          titleText: 'text-sm',
-          terminalBar: 'h-8',
+          titleBar: 'h-6',
+          titleText: 'text-xs',
+          terminalBar: 'h-6',
           terminalText: 'text-xs'
         });
       }
@@ -123,10 +124,38 @@ export default function Window({
 
   const handleMouseMove = (e) => {
     if (!isDragging) return;
-    setPosition({
-      x: e.clientX - dragStart.x,
-      y: e.clientY - dragStart.y
-    });
+
+    // Define boundaries - use responsive values based on screen size
+    const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1024;
+    const screenHeight = typeof window !== 'undefined' ? window.innerHeight : 768;
+
+    // MenuBar height matches the responsive MenuBar component
+    const menuBarHeight = getMenuBarHeight(screenWidth);
+    const toolbarHeight = 32;
+    const titleBarHeight = menuBarHeight; // Window title bar now matches menu bar
+    const maximizeThreshold = 10; // Pixels from top to trigger maximize
+
+    // Check if dragging to top edge (near menu bar) to trigger auto-maximize
+    const distanceFromTop = e.clientY - menuBarHeight;
+    if (distanceFromTop < maximizeThreshold && distanceFromTop >= 0) {
+      // Trigger maximize and stop dragging
+      setIsDragging(false);
+      onMaximize?.();
+      return;
+    }
+
+    // Calculate bounds
+    // Keep at least 100px visible so user can always grab the window
+    const minX = -(size.width - 100); // Allow dragging mostly off-screen but keep some visible
+    const maxX = screenWidth - 100; // Keep at least 100px visible on right
+    const minY = menuBarHeight; // Don't go above menu bar
+    const maxY = screenHeight - toolbarHeight - titleBarHeight; // Keep title bar above footer
+
+    // Clamp position within bounds
+    const newX = Math.max(minX, Math.min(maxX, e.clientX - dragStart.x));
+    const newY = Math.max(minY, Math.min(maxY, e.clientY - dragStart.y));
+
+    setPosition({ x: newX, y: newY });
   };
 
   const handleMouseUp = () => {
@@ -285,7 +314,7 @@ export default function Window({
         </div>
 
         {/* Terminal Content */}
-        <div className="h-[calc(100%-2rem)] overflow-auto bg-stone-900 text-green-400 font-mono text-sm p-4 leading-relaxed" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="h-[calc(100%-1.5rem)] overflow-auto bg-stone-900 text-green-400 font-mono text-sm p-4 leading-relaxed" style={{ position: 'relative', zIndex: 1 }}>
           {children}
         </div>
 
@@ -295,13 +324,13 @@ export default function Window({
             {/* Right edge resize */}
             <div
               onMouseDown={(e) => handleResizeStart(e, 'e')}
-              className="absolute right-0 top-8 bottom-8 w-2 cursor-ew-resize hover:bg-orange-400/20 transition-all"
+              className="absolute right-0 top-6 bottom-6 w-2 cursor-ew-resize hover:bg-orange-400/20 transition-all"
               style={{ zIndex: 100 }}
             />
             {/* Bottom edge resize */}
             <div
               onMouseDown={(e) => handleResizeStart(e, 's')}
-              className="absolute left-8 right-8 bottom-0 h-2 cursor-ns-resize hover:bg-orange-400/20 transition-all"
+              className="absolute left-6 right-6 bottom-0 h-2 cursor-ns-resize hover:bg-orange-400/20 transition-all"
               style={{ zIndex: 100 }}
             />
             {/* Corner resize */}
@@ -423,7 +452,7 @@ export default function Window({
       )}
 
       {/* Content */}
-      <div className={`${(fileMetadata.size || fileMetadata.modified || fileMetadata.language || fileMetadata.isPDF) ? 'h-[calc(100%-6rem)]' : 'h-[calc(100%-2.5rem)]'} ${fileMetadata.isPDF ? 'overflow-hidden' : 'overflow-auto'} bg-white`} style={{ position: 'relative', zIndex: 1 }}>
+      <div className={`${(fileMetadata.size || fileMetadata.modified || fileMetadata.language || fileMetadata.isPDF) ? 'h-[calc(100%-3.5rem)]' : 'h-[calc(100%-1.5rem)]'} ${fileMetadata.isPDF ? 'overflow-hidden' : 'overflow-auto'} bg-white`} style={{ position: 'relative', zIndex: 1 }}>
         {children}
       </div>
 
@@ -433,13 +462,13 @@ export default function Window({
           {/* Right edge resize */}
           <div
             onMouseDown={(e) => handleResizeStart(e, 'e')}
-            className="absolute right-0 top-10 bottom-10 w-2 cursor-ew-resize hover:bg-orange-400/20 transition-all"
+            className="absolute right-0 top-6 bottom-6 w-2 cursor-ew-resize hover:bg-orange-400/20 transition-all"
             style={{ zIndex: 100 }}
           />
           {/* Bottom edge resize */}
           <div
             onMouseDown={(e) => handleResizeStart(e, 's')}
-            className="absolute left-10 right-10 bottom-0 h-2 cursor-ns-resize hover:bg-orange-400/20 transition-all"
+            className="absolute left-6 right-6 bottom-0 h-2 cursor-ns-resize hover:bg-orange-400/20 transition-all"
             style={{ zIndex: 100 }}
           />
           {/* Corner resize */}

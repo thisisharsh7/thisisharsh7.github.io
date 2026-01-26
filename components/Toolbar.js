@@ -5,40 +5,40 @@ import SocialPreviewCard from './SocialPreviewCard';
 export default function Toolbar({ openWindows, onWindowRestore, onWindowFocus, activeWindowId, isMobile = false }) {
   const [hoveredLink, setHoveredLink] = useState(null);
   const [uiScale, setUiScale] = useState({
-    iconSize: 16,
-    height: 'h-8',
+    iconSize: 14,
+    height: 'h-7',
     textSize: 'text-xs',
     padding: 'px-3 py-1',
     gap: 'gap-2'
   });
 
-  // Scale toolbar based on screen size
+  // Scale toolbar based on screen size - slightly taller than menu bar for click targets
   useEffect(() => {
     const updateScale = () => {
       const width = window.innerWidth;
       if (width >= 2560) {
-        // 4K+
+        // 4K+ - h-9 (36px), only 4px taller than MenuBar h-8 (32px)
         setUiScale({
-          iconSize: 20,
-          height: 'h-10',
+          iconSize: 18,
+          height: 'h-9',
           textSize: 'text-sm',
           padding: 'px-4 py-1.5',
           gap: 'gap-3'
         });
       } else if (width >= 1920) {
-        // Large desktop
+        // Large - h-8 (32px), only 4px taller than MenuBar h-7 (28px)
         setUiScale({
-          iconSize: 18,
-          height: 'h-9',
-          textSize: 'text-xs',
+          iconSize: 16,
+          height: 'h-8',
+          textSize: 'text-sm',
           padding: 'px-3.5 py-1',
           gap: 'gap-2.5'
         });
       } else {
-        // Standard
+        // Standard - h-7 (28px), only 4px taller than MenuBar h-6 (24px)
         setUiScale({
-          iconSize: 16,
-          height: 'h-8',
+          iconSize: 14,
+          height: 'h-7',
           textSize: 'text-xs',
           padding: 'px-3 py-1',
           gap: 'gap-2'
@@ -125,7 +125,7 @@ export default function Toolbar({ openWindows, onWindowRestore, onWindowFocus, a
   // Mobile toolbar - Simplified
   if (isMobile) {
     return (
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-stone-200 z-30 shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-stone-200 z-40 shadow-lg">
         <div className="flex items-center justify-around py-3 px-4">
           {socialLinks.map((link) => (
             <a
@@ -146,7 +146,7 @@ export default function Toolbar({ openWindows, onWindowRestore, onWindowFocus, a
 
   // Desktop toolbar
   return (
-    <div className={`fixed bottom-0 left-0 right-0 ${uiScale.height} bg-white/80 backdrop-blur-xl border-t border-stone-200 flex items-center px-3 z-30 shadow-sm`}>
+    <div className={`fixed bottom-0 left-0 right-0 ${uiScale.height} bg-white/80 backdrop-blur-xl border-t border-stone-200 flex items-center px-3 z-40 shadow-sm`}>
       {/* Left side - Minimized windows */}
       <div className={`flex items-center ${uiScale.gap} overflow-x-auto`}>
         {minimizedWindows.map((window) => (

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getMenuBarHeightClass } from '../utils/constants';
 
-export default function MenuBar({ mouseY }) {
+export default function MenuBar({ mouseY, hasMaximizedWindow = false }) {
   const [time, setTime] = useState('');
   const [barHeight, setBarHeight] = useState('h-6');
   const [fontSize, setFontSize] = useState('text-xs');
@@ -10,14 +11,11 @@ export default function MenuBar({ mouseY }) {
   useEffect(() => {
     const updateBarScale = () => {
       const width = window.innerWidth;
-      if (width >= 2560) {
-        setBarHeight('h-8');
+      setBarHeight(getMenuBarHeightClass(width));
+
+      if (width >= 1920) {
         setFontSize('text-sm');
-      } else if (width >= 1920) {
-        setBarHeight('h-7');
-        setFontSize('text-xs');
       } else {
-        setBarHeight('h-6');
         setFontSize('text-xs');
       }
     };
@@ -48,8 +46,8 @@ export default function MenuBar({ mouseY }) {
     return () => clearInterval(interval);
   }, []);
 
-  // Auto-hide menu bar, show only when mouse is at top (like macOS)
-  const shouldShow = mouseY < 10;
+  // Auto-hide menu bar, show only when mouse is at top OR when a window is maximized (like macOS)
+  const shouldShow = mouseY < 10 || hasMaximizedWindow;
 
   return (
     <AnimatePresence>

@@ -8,6 +8,7 @@ import Window from '../components/Window';
 import WindowContent from '../components/WindowContent';
 import Toolbar from '../components/Toolbar';
 import { filesystem } from '../constants/filesystem';
+import { getMenuBarHeight } from '../utils/constants';
 
 export default function Desktop() {
   const [openWindows, setOpenWindows] = useState([]);
@@ -16,6 +17,7 @@ export default function Desktop() {
   const [mouseY, setMouseY] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
+  const [desktopPadding, setDesktopPadding] = useState(24);
   const hasAutoOpened = useRef(false);
 
   // Helper function to get file icon
@@ -48,6 +50,17 @@ export default function Desktop() {
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
     return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  // Update desktop padding to match responsive menu bar height
+  useEffect(() => {
+    const updateDesktopPadding = () => {
+      setDesktopPadding(getMenuBarHeight(window.innerWidth));
+    };
+
+    updateDesktopPadding();
+    window.addEventListener('resize', updateDesktopPadding);
+    return () => window.removeEventListener('resize', updateDesktopPadding);
   }, []);
 
   // Auto-open key files on initial load (desktop only)
@@ -158,11 +171,35 @@ export default function Desktop() {
   };
 
   const handleWindowFocus = (windowId) => {
-    const newZIndex = windowZIndex + 1;
-    setOpenWindows(openWindows.map(w =>
-      w.id === windowId ? { ...w, zIndex: newZIndex } : w
-    ));
-    setWindowZIndex(newZIndex);
+    // Find the current max z-index among all windows
+    const maxZIndex = Math.max(...openWindows.map(w => w.zIndex), 10);
+
+    // If we've hit the cap, reorder all windows' z-indices
+    if (maxZIndex >= 39) {
+      // Sort windows by current z-index
+      const sortedWindows = [...openWindows].sort((a, b) => a.zIndex - b.zIndex);
+
+      // Reassign z-indices starting from 10
+      let newZIndex = 10;
+      const reorderedWindows = openWindows.map(w => {
+        const sortedIndex = sortedWindows.findIndex(sw => sw.id === w.id);
+        // The focused window gets the highest z-index
+        if (w.id === windowId) {
+          return { ...w, zIndex: 10 + sortedWindows.length };
+        }
+        return { ...w, zIndex: 10 + sortedIndex };
+      });
+
+      setOpenWindows(reorderedWindows);
+      setWindowZIndex(10 + sortedWindows.length);
+    } else {
+      // Normal case: just increment z-index
+      const newZIndex = maxZIndex + 1;
+      setOpenWindows(openWindows.map(w =>
+        w.id === windowId ? { ...w, zIndex: newZIndex } : w
+      ));
+      setWindowZIndex(newZIndex);
+    }
   };
 
   const handleWindowMinimize = (windowId) => {
@@ -172,11 +209,38 @@ export default function Desktop() {
   };
 
   const handleWindowRestore = (windowId) => {
-    const newZIndex = windowZIndex + 1;
-    setOpenWindows(openWindows.map(w =>
-      w.id === windowId ? { ...w, minimized: false, zIndex: newZIndex } : w
-    ));
-    setWindowZIndex(newZIndex);
+    // Find the current max z-index among all windows
+    const maxZIndex = Math.max(...openWindows.map(w => w.zIndex), 10);
+
+    // Ensure position is within bounds - use responsive menu bar height
+    const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1024;
+    const screenHeight = typeof window !== 'undefined' ? window.innerHeight : 768;
+    const menuBarHeight = getMenuBarHeight(screenWidth);
+    const toolbarHeight = 32;
+    const win = openWindows.find(w => w.id === windowId);
+    const safeX = Math.max(0, Math.min(screenWidth - 200, win?.x || 100));
+    const safeY = Math.max(menuBarHeight, Math.min(screenHeight - toolbarHeight - 100, win?.y || 100));
+
+    // If we've hit the cap, reorder all windows' z-indices
+    if (maxZIndex >= 39) {
+      const sortedWindows = [...openWindows].sort((a, b) => a.zIndex - b.zIndex);
+      const reorderedWindows = openWindows.map(w => {
+        const sortedIndex = sortedWindows.findIndex(sw => sw.id === w.id);
+        if (w.id === windowId) {
+          return { ...w, minimized: false, zIndex: 10 + sortedWindows.length, x: safeX, y: safeY };
+        }
+        return { ...w, zIndex: 10 + sortedIndex };
+      });
+      setOpenWindows(reorderedWindows);
+      setWindowZIndex(10 + sortedWindows.length);
+    } else {
+      // Normal case
+      const newZIndex = maxZIndex + 1;
+      setOpenWindows(openWindows.map(w =>
+        w.id === windowId ? { ...w, minimized: false, zIndex: newZIndex, x: safeX, y: safeY } : w
+      ));
+      setWindowZIndex(newZIndex);
+    }
   };
 
   const handleWindowMaximize = (windowId) => {
@@ -339,10 +403,11 @@ export default function Desktop() {
       <div className="h-screen w-screen overflow-hidden font-sans select-none">
         <MenuBar
           mouseY={mouseY}
+          hasMaximizedWindow={openWindows.some(w => w.maximized)}
         />
 
         {/* Desktop Area */}
-        <div className="pt-6 h-full relative">
+        <div className="h-full relative" style={{ paddingTop: `${desktopPadding}px` }}>
           {/* Desktop Icons - Only show on desktop, not tablet */}
           {!isTablet && (
             <div className="relative h-full p-4">
@@ -399,7 +464,13 @@ export default function Desktop() {
                 const screenHeight = window.innerHeight;
 
                 if (win.maximized) {
-                  return { width: screenWidth, height: screenHeight };
+                  // Calculate responsive menu bar height
+                  const menuBarHeight = getMenuBarHeight(screenWidth);
+
+                  return {
+                    width: screenWidth,
+                    height: screenHeight - menuBarHeight
+                  };
                 }
 
                 // Large screens (1920px+): Bigger default windows
@@ -439,7 +510,15 @@ export default function Desktop() {
               const getResponsivePosition = () => {
                 if (typeof window === 'undefined') return { x: 100, y: 100 };
 
-                if (win.maximized) return { x: 0, y: 0 };
+                if (win.maximized) {
+                  // Calculate responsive menu bar height
+                  const menuBarHeight = getMenuBarHeight(window.innerWidth);
+
+                  return {
+                    x: 0,
+                    y: menuBarHeight
+                  };
+                }
 
                 // Tablet: Center windows
                 if (isTablet) {
