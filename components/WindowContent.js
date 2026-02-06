@@ -1,6 +1,7 @@
 import { FaFile, FaFolder, FaTerminal, FaCode, FaCube } from 'react-icons/fa';
 import { useState, useRef, useEffect } from 'react';
 import PDFViewer from './PDFViewer';
+import ProjectContent from './ProjectContent';
 
 const FileIconInline = ({ name, type, language, onClick, initialX, initialY, onDrag, containerRef }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -271,9 +272,9 @@ export default function WindowContent({ file, onFileOpen }) {
     };
 
     const handleItemClick = (child) => {
-      // For projects folder, open GitHub link directly
-      if (file.name === 'projects' && child.githubUrl) {
-        window.open(child.githubUrl, '_blank');
+      // Open all files in windows (no redirect)
+      if (file.name === 'projects') {
+        onFileOpen(child);
       } else {
         // For open-source or other folders, open the file normally
         onFileOpen(child);
@@ -335,6 +336,11 @@ export default function WindowContent({ file, onFileOpen }) {
         )}
       </div>
     );
+  }
+
+  // Project files with screenshots use ProjectContent component
+  if (file.name.endsWith('.md') && file.screenshots) {
+    return <ProjectContent file={file} />;
   }
 
   if (file.name.endsWith('.txt') || file.name.endsWith('.md')) {
