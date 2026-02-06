@@ -18,6 +18,7 @@ export default function Desktop() {
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [desktopPadding, setDesktopPadding] = useState(24);
+  const [selectedIcon, setSelectedIcon] = useState(null);
   const hasAutoOpened = useRef(false);
 
   // Helper function to get file icon
@@ -284,6 +285,17 @@ export default function Desktop() {
     }));
   };
 
+  const handleIconSelect = (iconName) => {
+    setSelectedIcon(iconName);
+  };
+
+  const handleDeselectAll = (e) => {
+    // Only deselect if clicking the desktop background itself
+    if (e.target === e.currentTarget) {
+      setSelectedIcon(null);
+    }
+  };
+
   // Mobile card view
   if (isMobile) {
     return (
@@ -410,7 +422,7 @@ export default function Desktop() {
         <div className="h-full relative" style={{ paddingTop: `${desktopPadding}px` }}>
           {/* Desktop Icons - Only show on desktop, not tablet */}
           {!isTablet && (
-            <div className="relative h-full p-4">
+            <div className="relative h-full p-4" onMouseDown={handleDeselectAll}>
               {filesystem.children.map((item, index) => {
                 const defaultPos = item.desktopPosition || { x: 20, y: 20 + index * 80 };
                 const pos = iconPositions[item.name] || defaultPos;
@@ -423,6 +435,8 @@ export default function Desktop() {
                     y={pos.y}
                     onClick={() => handleFileOpen(item, 120 + index * 35, 90 + index * 28)}
                     onDrag={handleIconDrag}
+                    isSelected={selectedIcon === item.name}
+                    onSelect={handleIconSelect}
                   />
                 );
               })}
@@ -556,6 +570,8 @@ export default function Desktop() {
                   <WindowContent
                     file={win.file}
                     onFileOpen={(file) => handleFileOpen(file, win.x + 50, win.y + 50)}
+                    selectedIcon={selectedIcon}
+                    onIconSelect={handleIconSelect}
                   />
                 </Window>
               );

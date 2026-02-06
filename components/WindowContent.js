@@ -1,12 +1,17 @@
 import { FaFile, FaFolder, FaTerminal, FaCode, FaCube } from 'react-icons/fa';
 import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import PDFViewer from './PDFViewer';
 import ProjectContent from './ProjectContent';
 
-const FileIconInline = ({ name, type, language, onClick, initialX, initialY, onDrag, containerRef }) => {
+const FileIconInline = ({ name, type, language, onClick, initialX, initialY, onDrag, containerRef, isSelected, onSelect }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x: initialX || 0, y: initialY || 0 });
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [dragDidOccur, setDragDidOccur] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const clickTimerRef = useRef(null);
+  const tooltipTimerRef = useRef(null);
   const [uiScale, setUiScale] = useState({
     iconSize: 40,
     appIconContainer: 'w-10 h-10',
@@ -75,6 +80,7 @@ const FileIconInline = ({ name, type, language, onClick, initialX, initialY, onD
 
   const handleMouseDown = (e) => {
     setIsDragging(true);
+    setDragDidOccur(false);
     setDragStart({
       x: e.clientX - position.x,
       y: e.clientY - position.y
@@ -83,6 +89,8 @@ const FileIconInline = ({ name, type, language, onClick, initialX, initialY, onD
 
   const handleMouseMove = (e) => {
     if (!isDragging) return;
+
+    setDragDidOccur(true);
 
     let newX = e.clientX - dragStart.x;
     let newY = e.clientY - dragStart.y;
@@ -107,8 +115,33 @@ const FileIconInline = ({ name, type, language, onClick, initialX, initialY, onD
     }
   };
 
+  const handleClick = () => {
+    if (dragDidOccur) return;
+    if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+    clickTimerRef.current = setTimeout(() => {
+      onSelect?.(name);
+      setShowTooltip(true);
+
+      // Hide tooltip after 1 second
+      if (tooltipTimerRef.current) clearTimeout(tooltipTimerRef.current);
+      tooltipTimerRef.current = setTimeout(() => {
+        setShowTooltip(false);
+      }, 1000);
+    }, 250);
+  };
+
   const handleDoubleClick = (e) => {
-    if (!isDragging && onClick) {
+    if (clickTimerRef.current) {
+      clearTimeout(clickTimerRef.current);
+      clickTimerRef.current = null;
+    }
+    if (tooltipTimerRef.current) {
+      clearTimeout(tooltipTimerRef.current);
+      tooltipTimerRef.current = null;
+    }
+    setShowTooltip(false);
+    onSelect?.(null); // Clear selection on double-click
+    if (!isDragging && !dragDidOccur && onClick) {
       onClick();
     }
   };
@@ -129,6 +162,28 @@ const FileIconInline = ({ name, type, language, onClick, initialX, initialY, onD
       setPosition({ x: initialX, y: initialY });
     }
   }, [initialX, initialY]);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (clickTimerRef.current) {
+        clearTimeout(clickTimerRef.current);
+      }
+      if (tooltipTimerRef.current) {
+        clearTimeout(tooltipTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Reset tooltip when selection changes
+  useEffect(() => {
+    if (!isSelected) {
+      setShowTooltip(false);
+      if (tooltipTimerRef.current) {
+        clearTimeout(tooltipTimerRef.current);
+      }
+    }
+  }, [isSelected]);
 
   const getIcon = () => {
     if (type === 'folder') {
@@ -170,9 +225,10 @@ const FileIconInline = ({ name, type, language, onClick, initialX, initialY, onD
 
   return (
     <div
-      onMouseDown={handleMouseDown}
+      onClick={handleClick}
       onDoubleClick={handleDoubleClick}
-      className={`absolute flex flex-col items-center gap-2 p-2 rounded-lg hover:bg-stone-50 transition-colors ${isDragging ? 'cursor-grabbing' : 'cursor-default'}`}
+      onMouseDown={handleMouseDown}
+      className={`absolute flex flex-col items-center gap-2 p-2 rounded-lg hover:bg-stone-50 transition-colors ${isDragging ? 'cursor-grabbing' : 'cursor-default'} ${isSelected ? 'ring-2 ring-orange-400/60 ring-offset-2' : ''}`}
       style={{ left: position.x, top: position.y }}
     >
       <div className="flex flex-col items-center gap-2 select-none">
@@ -188,11 +244,24 @@ const FileIconInline = ({ name, type, language, onClick, initialX, initialY, onD
           )}
         </div>
       </div>
+      <AnimatePresence>
+        {showTooltip && (
+          <motion.div
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={{ duration: 0.15 }}
+            className="absolute top-full mt-1 px-2 py-1 bg-stone-800 text-white text-xs rounded whitespace-nowrap pointer-events-none z-50 shadow-lg"
+          >
+            Double click to open
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
 
-export default function WindowContent({ file, onFileOpen }) {
+export default function WindowContent({ file, onFileOpen, selectedIcon, onIconSelect }) {
   const [filePositions, setFilePositions] = useState({});
   const containerRef = useRef(null);
   const [contentScale, setContentScale] = useState({
@@ -288,6 +357,12 @@ export default function WindowContent({ file, onFileOpen }) {
       }));
     };
 
+    const handleDeselectInFolder = (e) => {
+      if (e.target === e.currentTarget && onIconSelect) {
+        onIconSelect(null);
+      }
+    };
+
     // Default grid positions
     const getDefaultPosition = (index) => {
       const cols = 4;
@@ -301,7 +376,7 @@ export default function WindowContent({ file, onFileOpen }) {
 
     return (
       <div className="h-full flex flex-col">
-        <div ref={containerRef} className="flex-1 relative overflow-auto p-6">
+        <div ref={containerRef} className="flex-1 relative overflow-auto p-6" onMouseDown={handleDeselectInFolder}>
           {file.children?.map((child, index) => {
             const defaultPos = getDefaultPosition(index);
             const position = filePositions[child.name] || defaultPos;
@@ -317,6 +392,8 @@ export default function WindowContent({ file, onFileOpen }) {
                 initialY={position.y}
                 onDrag={handleDrag}
                 containerRef={containerRef}
+                isSelected={selectedIcon === child.name}
+                onSelect={onIconSelect}
               />
             );
           })}

@@ -1,11 +1,16 @@
 import { FaFile, FaFolder, FaTerminal, FaCode, FaFilePdf } from 'react-icons/fa';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-export default function FileIcon({ name, type, onClick, x, y, onDrag }) {
+export default function FileIcon({ name, type, onClick, x, y, onDrag, isSelected, onSelect }) {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x, y });
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [iconSize, setIconSize] = useState(40);
+  const [dragDidOccur, setDragDidOccur] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const clickTimerRef = useRef(null);
+  const tooltipTimerRef = useRef(null);
 
   // Scale icons based on screen size
   useEffect(() => {
@@ -48,6 +53,7 @@ export default function FileIcon({ name, type, onClick, x, y, onDrag }) {
 
   const handleMouseDown = (e) => {
     setIsDragging(true);
+    setDragDidOccur(false);
     setDragStart({
       x: e.clientX - position.x,
       y: e.clientY - position.y
@@ -56,6 +62,8 @@ export default function FileIcon({ name, type, onClick, x, y, onDrag }) {
 
   const handleMouseMove = (e) => {
     if (!isDragging) return;
+
+    setDragDidOccur(true);
 
     // Constrain to viewport minus menu bar (24px) and toolbar (32px)
     const menuBarHeight = 24;
@@ -103,17 +111,84 @@ export default function FileIcon({ name, type, onClick, x, y, onDrag }) {
     return 'max-w-20'; // Standard
   };
 
+  const handleClick = () => {
+    if (dragDidOccur) return;
+    if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+    clickTimerRef.current = setTimeout(() => {
+      onSelect?.(name);
+      setShowTooltip(true);
+
+      // Hide tooltip after 1 second
+      if (tooltipTimerRef.current) clearTimeout(tooltipTimerRef.current);
+      tooltipTimerRef.current = setTimeout(() => {
+        setShowTooltip(false);
+      }, 1000);
+    }, 250);
+  };
+
+  const handleDoubleClick = () => {
+    if (clickTimerRef.current) {
+      clearTimeout(clickTimerRef.current);
+      clickTimerRef.current = null;
+    }
+    if (tooltipTimerRef.current) {
+      clearTimeout(tooltipTimerRef.current);
+      tooltipTimerRef.current = null;
+    }
+    setShowTooltip(false);
+    onSelect?.(null); // Clear selection on double-click
+    if (!dragDidOccur && onClick) {
+      onClick();
+    }
+  };
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (clickTimerRef.current) {
+        clearTimeout(clickTimerRef.current);
+      }
+      if (tooltipTimerRef.current) {
+        clearTimeout(tooltipTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Reset tooltip when selection changes
+  useEffect(() => {
+    if (!isSelected) {
+      setShowTooltip(false);
+      if (tooltipTimerRef.current) {
+        clearTimeout(tooltipTimerRef.current);
+      }
+    }
+  }, [isSelected]);
+
   return (
     <button
-      onDoubleClick={onClick}
+      onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
       onMouseDown={handleMouseDown}
-      className={`absolute flex flex-col items-center gap-1 p-2 rounded hover:bg-white/40 transition-colors group ${isDragging ? 'cursor-move' : 'cursor-default'}`}
+      className={`absolute flex flex-col items-center gap-1 p-2 rounded hover:bg-white/40 transition-colors group ${isDragging ? 'cursor-move' : 'cursor-default'} ${isSelected ? 'ring-2 ring-orange-400/60 ring-offset-2 ring-offset-transparent' : ''}`}
       style={{ left: position.x, top: position.y }}
     >
       <div className="select-none">{getIcon()}</div>
       <span className={`${getTextSize()} text-stone-700 font-mono ${getMaxWidth()} truncate select-none`}>
         {name}
       </span>
+      <AnimatePresence>
+        {showTooltip && (
+          <motion.div
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={{ duration: 0.15 }}
+            className="absolute top-full mt-1 px-2 py-1 bg-stone-800 text-white text-xs rounded whitespace-nowrap pointer-events-none z-50 shadow-lg"
+          >
+            Double click to open
+          </motion.div>
+        )}
+      </AnimatePresence>
     </button>
   );
 }
