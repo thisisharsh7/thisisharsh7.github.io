@@ -84,10 +84,36 @@ export const filesystem = {
     {
       name: 'projects',
       type: 'folder',
-      size: '3 items',
+      size: '4 items',
       modified: 'Feb 6, 2026',
       desktopPosition: { x: 26, y: 205 },
       children: [
+                {
+          name: 'snorlax.md',
+          type: 'file',
+          size: '180 KB',
+          modified: 'Feb 6, 2026',
+          language: 'Python',
+          githubUrl: 'https://github.com/thisisharsh7/snorlax',
+          content: `<div class="space-y-6">
+            <div>
+              <h2 class="text-2xl font-medium mb-2 text-stone-800">Snorlax</h2>
+              <p class="text-sm text-stone-500 font-mono mb-6">Python · TypeScript · PostgreSQL · 9 stars</p>
+            </div>
+
+            <div class="space-y-4 text-stone-700">
+              <p>AI-powered GitHub issue triage that finds duplicates, searches your codebase, and drafts responses.</p>
+
+              <p>Indexes your repository's code and issues. Uses semantic search and Claude AI to analyze incoming issues. Finds similar issues and PRs. Searches relevant code. Categorizes issues. Drafts responses you can review and post.</p>
+
+              <p>Local-first tool. Runs with Docker. Saves maintainers hours every week. ~$0.003 per issue with smart caching.</p>
+
+              <div class="flex gap-3 pt-4">
+                <a href="https://github.com/thisisharsh7/snorlax" target="_blank" class="px-4 py-2 bg-stone-200 hover:bg-stone-300 rounded text-sm transition-colors text-stone-800">Source Code</a>
+              </div>
+            </div>
+          </div>`
+        },
         {
           name: 'seeva-ai-assistant.md',
           type: 'file',
