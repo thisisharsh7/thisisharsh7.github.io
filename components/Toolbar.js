@@ -109,12 +109,12 @@ export default function Toolbar({ openWindows, onWindowRestore, onWindowFocus, a
     {
       id: 'email',
       icon: FaEnvelope,
-      url: 'mailto:harsh@example.com',
+      url: 'mailto:9u.harsh@gmail.com',
       label: 'Email',
       color: 'text-orange-500 hover:text-orange-600',
       preview: {
         title: 'Email Harsh Kumar',
-        url: 'harsh@example.com',
+        url: '9u.harsh@gmail.com',
         description: 'Get in touch for collaborations, questions, or just to say hi.',
         icon: FaEnvelope,
         gradient: 'bg-gradient-to-br from-orange-500 to-orange-600'
