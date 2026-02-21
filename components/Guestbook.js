@@ -69,15 +69,15 @@ export default function Guestbook() {
     const script = document.createElement('script');
     script.src = 'https://giscus.app/client.js';
     script.setAttribute('data-repo', 'thisisharsh7/thisisharsh7.github.io');
-    script.setAttribute('data-repo-id', 'R_kgDONlFVNw');
+    script.setAttribute('data-repo-id', 'R_kgDOIJbhKw');
     script.setAttribute('data-category', 'Guestbook');
-    script.setAttribute('data-category-id', 'DIC_kwDONlFVN84CnMjp');
+    script.setAttribute('data-category-id', 'DIC_kwDOIJbhK84C26Mg');
     script.setAttribute('data-mapping', 'specific');
     script.setAttribute('data-term', 'guestbook');
     script.setAttribute('data-strict', '0');
     script.setAttribute('data-reactions-enabled', '1');
     script.setAttribute('data-emit-metadata', '0');
-    script.setAttribute('data-input-position', 'top');
+    script.setAttribute('data-input-position', 'bottom');
     script.setAttribute('data-theme', 'light');
     script.setAttribute('data-lang', 'en');
     script.setAttribute('data-loading', 'lazy');
