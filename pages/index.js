@@ -191,6 +191,18 @@ export default function Desktop() {
       return;
     }
 
+    // Un-maximize any currently maximized windows before opening a new file
+    const updatedWindows = openWindows.map(w => {
+      if (w.maximized) {
+        return {
+          ...w,
+          maximized: false,
+          ...(w.originalSize || {})
+        };
+      }
+      return w;
+    });
+
     const newWindow = {
       id: Date.now(),
       file,
@@ -202,7 +214,7 @@ export default function Desktop() {
       originalSize: null
     };
 
-    setOpenWindows([...openWindows, newWindow]);
+    setOpenWindows([...updatedWindows, newWindow]);
     setWindowZIndex(windowZIndex + 1);
   };
 
