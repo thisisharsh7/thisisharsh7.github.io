@@ -62,12 +62,12 @@ export default function FullPortfolioPage() {
       <Head>
         <title>Harsh | Full Portfolio</title>
         <meta name="description" content="A comprehensive overview of Harsh Kumar's portfolio as a Full-Stack Developer with 2+ years experience. Currently sponsored open source maintainer at Epicenter (YC S25), including experience, projects, and achievements." />
-        <link rel="canonical" href="https://dev-harsh.vercel.app/all" />
+        <link rel="canonical" href="https://thisisharsh7.github.io/all" />
         <meta property="og:title" content="Harsh | Full Portfolio" />
         <meta property="og:description" content="Explore Harsh Kumar's complete portfolio with 2+ years Full-Stack development experience, showcasing expertise in React, Node.js, AI integrations, and open source contributions at Epicenter (YC S25)." />
         <meta property="og:image" content="/images/og-image.jpg" />
         <meta property="og:image:alt" content="Harsh's full portfolio overview" />
-        <meta property="og:url" content="https://dev-harsh.vercel.app/all" />
+        <meta property="og:url" content="https://thisisharsh7.github.io/all" />
         <meta name="twitter:image" content="/images/og-image.jpg" />
         <meta name="twitter:image:alt" content="Harsh's full portfolio overview" />
         <script
@@ -77,7 +77,7 @@ export default function FullPortfolioPage() {
               '@context': 'https://schema.org',
               '@type': 'CollectionPage',
               'name': 'Harsh | Full Portfolio',
-              'url': 'https://dev-harsh.vercel.app/all',
+              'url': 'https://thisisharsh7.github.io/all',
               'description': 'A complete showcase of Harsh Kumar\'s professional journey with 2+ years Full-Stack development experience, projects, and achievements.',
               'publisher': {
                 '@type': 'Person',

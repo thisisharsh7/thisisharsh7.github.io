@@ -32,12 +32,12 @@ export default function AboutPage() {
             <Head>
                 <title>Harsh | About Me</title>
                 <meta name="description" content="Learn about Harsh Kumar, a Full-Stack Developer with 2+ years experience. Currently sponsored open source maintainer at Epicenter (YC S25) specializing in React, Next.js, Node.js, and AI integrations." />
-                <link rel="canonical" href="https://dev-harsh.vercel.app/about" />
+                <link rel="canonical" href="https://thisisharsh7.github.io/about" />
                 <meta property="og:title" content="Harsh | About Me" />
                 <meta property="og:description" content="Full-Stack Developer with 2+ years experience. Sponsored open source maintainer at Epicenter (YC S25) building scalable web applications." />
                 <meta property="og:image" content="/images/Harsh_Profile_Pic.jpg" />
                 <meta property="og:image:alt" content="Harsh's profile picture" />
-                <meta property="og:url" content="https://dev-harsh.vercel.app/about" />
+                <meta property="og:url" content="https://thisisharsh7.github.io/about" />
                 <meta name="twitter:image" content="/images/Harsh_Profile_Pic.jpg" />
                 <meta name="twitter:image:alt" content="Harsh's profile picture" />
                 <script
@@ -48,8 +48,8 @@ export default function AboutPage() {
                             '@type': 'Person',
                             'name': 'Harsh Kumar',
                             'jobTitle': 'Full-Stack Developer | Open Source Maintainer',
-                            'url': 'https://dev-harsh.vercel.app/about',
-                            'image': 'https://dev-harsh.vercel.app/images/Harsh_Profile_Pic.jpg',
+                            'url': 'https://thisisharsh7.github.io/about',
+                            'image': 'https://thisisharsh7.github.io/images/Harsh_Profile_Pic.jpg',
                             'sameAs': [
                                 'https://github.com/thisisharsh7',
                                 'https://linkedin.com/in/thisisharsh7',

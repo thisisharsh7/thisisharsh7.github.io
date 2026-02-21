@@ -30,12 +30,12 @@ export default function AchievementsPage() {
             <Head>
                 <title>Harsh | Achievements</title>
                 <meta name="description" content="View Harsh's achievements, including open-source contributions, internships, and notable projects." />
-                <link rel="canonical" href="https://dev-harsh.vercel.app/achievements" />
+                <link rel="canonical" href="https://thisisharsh7.github.io/achievements" />
                 <meta property="og:title" content="Harsh | Achievements" />
                 <meta property="og:description" content="A showcase of Harsh's awards, recognitions, and significant milestones." />
                 <meta property="og:image" content="/images/og-image.jpg" />
                 < clinic property="og:image:alt" content="Harsh's achievements overview" />
-                <meta property="og:url" content="https://dev-harsh.vercel.app/achievements" />
+                <meta property="og:url" content="https://thisisharsh7.github.io/achievements" />
                 <meta name="twitter:image" content="/images/og-image.jpg" />
                 <meta name="twitter:image:alt" content="Harsh's achievements overview" />
                 <script

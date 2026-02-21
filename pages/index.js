@@ -355,10 +355,10 @@ export default function Desktop() {
           <title>Harsh Kumar</title>
           <meta name="description" content="I build software for the web. Currently working on Epicenter and Cognee." />
           <meta name="keywords" content="Harsh Kumar, Software Engineer, Full-Stack Developer, React, Next.js, Node.js, TypeScript, Python" />
-          <link rel="canonical" href="https://dev-harsh.vercel.app/" />
+          <link rel="canonical" href="https://thisisharsh7.github.io/" />
           <meta property="og:title" content="Harsh Kumar" />
           <meta property="og:description" content="I build software for the web. Currently working on Epicenter and Cognee." />
-          <meta property="og:url" content="https://dev-harsh.vercel.app/" />
+          <meta property="og:url" content="https://thisisharsh7.github.io/" />
           <meta name="twitter:title" content="Harsh Kumar" />
           <meta name="twitter:description" content="I build software for the web." />
         </Head>
@@ -455,10 +455,10 @@ export default function Desktop() {
         <title>Harsh Kumar</title>
         <meta name="description" content="I build software for the web. Currently working on Epicenter and Cognee." />
         <meta name="keywords" content="Harsh Kumar, Software Engineer, Full-Stack Developer, React, Next.js, Node.js, TypeScript, Python" />
-        <link rel="canonical" href="https://dev-harsh.vercel.app/" />
+        <link rel="canonical" href="https://thisisharsh7.github.io/" />
         <meta property="og:title" content="Harsh Kumar" />
         <meta property="og:description" content="I build software for the web. Currently working on Epicenter and Cognee." />
-        <meta property="og:url" content="https://dev-harsh.vercel.app/" />
+        <meta property="og:url" content="https://thisisharsh7.github.io/" />
         <meta name="twitter:title" content="Harsh Kumar" />
         <meta name="twitter:description" content="I build software for the web." />
       </Head>
