@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PDFViewer from './PDFViewer';
 import ProjectContent from './ProjectContent';
+import Guestbook from './Guestbook';
 
 const FileIconInline = ({ name, type, language, onClick, initialX, initialY, onDrag, containerRef, isSelected, onSelect }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -332,6 +333,10 @@ export default function WindowContent({ file, onFileOpen, selectedIcon, onIconSe
 
   if (file.isPDF) {
     return <PDFViewer />;
+  }
+
+  if (file.isGuestbook) {
+    return <Guestbook />;
   }
 
   if (file.type === 'folder') {

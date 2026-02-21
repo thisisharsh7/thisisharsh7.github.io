@@ -279,6 +279,14 @@ export const filesystem = {
         }
       ]
     },
+    {
+      name: 'guestbook.md',
+      type: 'file',
+      size: '2.4 KB',
+      modified: 'Feb 21, 2026',
+      desktopPosition: { x: 24, y: 490 },
+      isGuestbook: true
+    }
   ]
 };
 

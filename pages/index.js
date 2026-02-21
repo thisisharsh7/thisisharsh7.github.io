@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FaFile, FaFolder, FaFilePdf, FaCode, FaTerminal } from 'react-icons/fa';
+import { FaFile, FaFolder, FaFilePdf, FaCode, FaTerminal, FaBook } from 'react-icons/fa';
 import MenuBar from '../components/MenuBar';
 import FileIcon from '../components/FileIcon';
 import Window from '../components/Window';
@@ -25,6 +25,9 @@ export default function Desktop() {
   const getFileIcon = (item, size = 32) => {
     if (item.type === 'folder') {
       return <FaFolder className="text-orange-500" size={size} />;
+    }
+    if (item.isGuestbook) {
+      return <FaBook className="text-blue-600" size={size} />;
     }
     if (item.name.endsWith('.pdf')) {
       return <FaFilePdf className="text-red-600" size={size} />;
@@ -437,6 +440,7 @@ export default function Desktop() {
                     onDrag={handleIconDrag}
                     isSelected={selectedIcon === item.name}
                     onSelect={handleIconSelect}
+                    isGuestbook={item.isGuestbook}
                   />
                 );
               })}

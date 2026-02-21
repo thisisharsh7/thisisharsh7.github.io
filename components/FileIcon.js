@@ -1,8 +1,8 @@
-import { FaFile, FaFolder, FaTerminal, FaCode, FaFilePdf } from 'react-icons/fa';
+import { FaFile, FaFolder, FaTerminal, FaCode, FaFilePdf, FaBook } from 'react-icons/fa';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function FileIcon({ name, type, onClick, x, y, onDrag, isSelected, onSelect }) {
+export default function FileIcon({ name, type, onClick, x, y, onDrag, isSelected, onSelect, isGuestbook }) {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x, y });
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -35,6 +35,9 @@ export default function FileIcon({ name, type, onClick, x, y, onDrag, isSelected
   const getIcon = () => {
     if (type === 'folder') {
       return <FaFolder className="text-orange-500" size={iconSize} />;
+    }
+    if (isGuestbook) {
+      return <FaBook className="text-blue-600" size={iconSize} />;
     }
     if (name.endsWith('.pdf')) {
       return <FaFilePdf className="text-red-600" size={iconSize} />;
