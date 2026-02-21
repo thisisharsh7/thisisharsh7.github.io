@@ -85,9 +85,13 @@ export default function Desktop() {
       const readmeFile = filesystem.children.find(f => f.name === 'README.txt');
       const nowFile = filesystem.children.find(f => f.name === 'now.md');
       const projectsFolder = filesystem.children.find(f => f.name === 'projects');
+      const guestbookFile = filesystem.children.find(f => f.isGuestbook);
 
       const initialWindows = [];
       let zIndex = 11;
+
+      // Check if guestbook should be reopened (after OAuth redirect)
+      const shouldReopenGuestbook = localStorage.getItem('guestbookOpen') === 'true';
 
       if (readmeFile) {
         initialWindows.push({
@@ -128,6 +132,20 @@ export default function Desktop() {
         });
       }
 
+      // Reopen guestbook if flag is set (from OAuth redirect)
+      if (shouldReopenGuestbook && guestbookFile) {
+        initialWindows.push({
+          id: Date.now() + 3,
+          file: guestbookFile,
+          x: 300,
+          y: 60,
+          zIndex: zIndex++,
+          minimized: false,
+          maximized: false,
+          originalSize: null
+        });
+      }
+
       setOpenWindows(initialWindows);
       setWindowZIndex(zIndex);
     }, 100);
@@ -142,6 +160,24 @@ export default function Desktop() {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
+
+  // Handle guestbook reopening after OAuth (for mobile/tablet or late reopening)
+  useEffect(() => {
+    // Skip if already handled by auto-open
+    if (hasAutoOpened.current) return;
+    if (typeof window === 'undefined') return;
+
+    const shouldReopenGuestbook = localStorage.getItem('guestbookOpen') === 'true';
+    if (shouldReopenGuestbook) {
+      const guestbookFile = filesystem.children.find(f => f.isGuestbook);
+      if (guestbookFile && openWindows.length === 0) {
+        // Open guestbook on mobile/tablet
+        setTimeout(() => {
+          handleFileOpen(guestbookFile, 100, 100);
+        }, 200);
+      }
+    }
+  }, [openWindows.length]);
 
   const handleFileOpen = (file, x = 100, y = 100) => {
     const existingWindow = openWindows.find(w => w.file.name === file.name);
@@ -429,6 +465,8 @@ export default function Desktop() {
               {filesystem.children.map((item, index) => {
                 const defaultPos = item.desktopPosition || { x: 20, y: 20 + index * 80 };
                 const pos = iconPositions[item.name] || defaultPos;
+                // Position guestbook higher so sign-in button is visible
+                const openY = item.isGuestbook ? 60 : (90 + index * 28);
                 return (
                   <FileIcon
                     key={item.name}
@@ -436,7 +474,7 @@ export default function Desktop() {
                     type={item.type}
                     x={pos.x}
                     y={pos.y}
-                    onClick={() => handleFileOpen(item, 120 + index * 35, 90 + index * 28)}
+                    onClick={() => handleFileOpen(item, 120 + index * 35, openY)}
                     onDrag={handleIconDrag}
                     isSelected={selectedIcon === item.name}
                     onSelect={handleIconSelect}

@@ -54,6 +54,9 @@ export default function Guestbook() {
   }, []);
 
   useEffect(() => {
+    // Set flag that guestbook is open (for OAuth redirect recovery)
+    localStorage.setItem('guestbookOpen', 'true');
+
     // Remove existing giscus script if present
     const existingScript = document.querySelector('script[src*="giscus"]');
     if (existingScript) {
@@ -90,7 +93,7 @@ export default function Guestbook() {
     }
 
     return () => {
-      // Cleanup on unmount
+      // Cleanup on unmount - only clear flag if window is explicitly closed
       const container = commentsRef.current;
       if (container) {
         // Use a more gentle cleanup to avoid React warnings
@@ -99,6 +102,8 @@ export default function Guestbook() {
           iframe.remove();
         }
       }
+      // Clear the flag when component unmounts
+      localStorage.removeItem('guestbookOpen');
     };
   }, []);
 
