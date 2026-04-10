@@ -6,7 +6,7 @@ export const filesystem = {
       name: 'README.txt',
       type: 'file',
       size: '856 B',
-      modified: 'Apr 06, 2026',
+      modified: 'Apr 10, 2026',
       desktopPosition: { x: 20, y: 20 },
       content: `<p class="mb-4">I grew up in <a href="https://en.wikipedia.org/wiki/Bihar" target="_blank">Bihar, India</a>. Eldest of three siblings.</p>
 
@@ -30,7 +30,7 @@ export const filesystem = {
       name: 'resume.pdf',
       type: 'file',
       size: '245 KB',
-      modified: 'Apr 06, 2026',
+      modified: 'Apr 10, 2026',
       desktopPosition: { x: 24, y: 395 },
       isPDF: true,
       downloadUrl: '/doc/HARSH_KUMAR_2026_resume.pdf',
@@ -40,7 +40,7 @@ export const filesystem = {
       name: 'now.md',
       type: 'file',
       size: '3.1 KB',
-      modified: 'Apr 06, 2026',
+      modified: 'Apr 10, 2026',
       desktopPosition: { x: 24, y: 115 },
       content: `<h2 class="text-2xl font-medium mb-6 text-stone-800">What I'm working on</h2>
 
@@ -85,14 +85,14 @@ export const filesystem = {
       name: 'projects',
       type: 'folder',
       size: '4 items',
-      modified: 'Apr 06, 2026',
+      modified: 'Apr 10, 2026',
       desktopPosition: { x: 26, y: 205 },
       children: [
                 {
           name: 'snorlax.md',
           type: 'file',
           size: '180 KB',
-          modified: 'Apr 06, 2026',
+          modified: 'Apr 10, 2026',
           language: 'Python',
           githubUrl: 'https://github.com/thisisharsh7/snorlax',
           screenshots: [
@@ -126,7 +126,7 @@ export const filesystem = {
           name: 'seeva-ai-assistant.md',
           type: 'file',
           size: '234 KB',
-          modified: 'Apr 06, 2026',
+          modified: 'Apr 10, 2026',
           language: 'TypeScript',
           githubUrl: 'https://github.com/thisisharsh7/seeva-ai-assistant',
           websiteUrl: 'https://thisisharsh7.github.io/seeva-ai-assistant/',
@@ -227,14 +227,14 @@ export const filesystem = {
       name: 'open-source',
       type: 'folder',
       size: '3 items',
-      modified: 'Apr 06, 2026',
+      modified: 'Apr 10, 2026',
       desktopPosition: { x: 22, y: 300 },
       children: [
         {
           name: 'epicenter.md',
           type: 'file',
           size: '1.1 KB',
-          modified: 'Apr 06, 2026',
+          modified: 'Apr 10, 2026',
           content: `<h2 class="text-2xl font-medium mb-6 text-stone-800">Epicenter</h2>
 
 <p class="text-sm text-stone-500 font-mono mb-6">YC S25 · 3,954 stars · Aug 2025 – Present</p>
@@ -251,7 +251,7 @@ export const filesystem = {
           name: 'cocoindex.md',
           type: 'file',
           size: '512 B',
-          modified: 'Apr 06, 2026',
+          modified: 'Apr 10, 2026',
           content: `<h2 class="text-2xl font-medium mb-6 text-stone-800">cocoindex</h2>
 
 <p class="text-sm text-stone-500 font-mono mb-6">5,933 stars</p>
@@ -266,7 +266,7 @@ export const filesystem = {
           name: 'codebuff.md',
           type: 'file',
           size: '384 B',
-          modified: 'Apr 06, 2026',
+          modified: 'Apr 10, 2026',
           content: `<h2 class="text-2xl font-medium mb-6 text-stone-800">CodeBuff</h2>
 
 <p class="text-sm text-stone-500 font-mono mb-6">2,722 stars</p>
@@ -283,7 +283,7 @@ export const filesystem = {
       name: 'guestbook.md',
       type: 'file',
       size: '2.4 KB',
-      modified: 'Apr 06, 2026',
+      modified: 'Apr 10, 2026',
       desktopPosition: { x: 24, y: 490 },
       isGuestbook: true
     }
