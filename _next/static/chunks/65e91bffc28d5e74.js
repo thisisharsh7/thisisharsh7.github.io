@@ -22,7 +22,7 @@
 
 <p class="mt-8 text-stone-600">If you're building something interesting, <a href="mailto:9u.harsh@gmail.com">let's talk</a>.</p>
 
-<p class="mt-6 text-stone-500">— Harsh</p>`},{name:"resume.pdf",type:"file",size:"245 KB",modified:"Apr 27, 2026",desktopPosition:{x:24,y:395},isPDF:!0,downloadUrl:"/doc/HARSH_KUMAR_2026_resume.pdf",shareUrl:"https://drive.google.com/file/d/1Xem9q9AhpRiw9Fo4cvWHqDqEL3tUoGGE/view?usp=sharing"},{name:"now.md",type:"file",size:"3.1 KB",modified:"Apr 27, 2026",desktopPosition:{x:24,y:115},content:`<h2 class="text-2xl font-medium mb-6 text-stone-800">What I'm working on</h2>
+<p class="mt-6 text-stone-500">— Harsh</p>`},{name:"resume.pdf",type:"file",size:"90 KB",modified:"Jun 16, 2026",desktopPosition:{x:24,y:395},isPDF:!0,downloadUrl:"/doc/HARSH_KUMAR_2026_resume.pdf",shareUrl:"https://drive.google.com/file/d/1Xem9q9AhpRiw9Fo4cvWHqDqEL3tUoGGE/view?usp=sharing"},{name:"now.md",type:"file",size:"3.1 KB",modified:"Apr 27, 2026",desktopPosition:{x:24,y:115},content:`<h2 class="text-2xl font-medium mb-6 text-stone-800">What I'm working on</h2>
 
 <p class="mb-4"><strong>Cognee</strong><br/>
 <span class="text-sm text-stone-500">Dec 2025 – Present</span></p>
