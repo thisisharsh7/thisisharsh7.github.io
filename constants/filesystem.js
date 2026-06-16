@@ -29,8 +29,8 @@ export const filesystem = {
     {
       name: 'resume.pdf',
       type: 'file',
-      size: '245 KB',
-      modified: 'Apr 27, 2026',
+      size: '90 KB',
+      modified: 'Jun 16, 2026',
       desktopPosition: { x: 24, y: 395 },
       isPDF: true,
       downloadUrl: '/doc/HARSH_KUMAR_2026_resume.pdf',
