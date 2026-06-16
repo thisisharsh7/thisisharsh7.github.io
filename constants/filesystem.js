@@ -34,7 +34,7 @@ export const filesystem = {
       desktopPosition: { x: 24, y: 395 },
       isPDF: true,
       downloadUrl: '/doc/HARSH_KUMAR_2026_resume.pdf',
-      shareUrl: 'https://drive.google.com/file/d/16DSvMyVfGH5xtncoHGMiC21xTahaD_1u/view?usp=sharing'
+      shareUrl: 'https://drive.google.com/file/d/1Xem9q9AhpRiw9Fo4cvWHqDqEL3tUoGGE/view?usp=sharing'
     },
     {
       name: 'now.md',
