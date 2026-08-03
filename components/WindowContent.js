@@ -210,7 +210,7 @@ const FileIconInline = ({ name, type, language, onClick, initialX, initialY, onD
         );
       }
       // Open source files get GitHub-style icons with stars
-      if (name.includes('epicenter') || name.includes('cocoindex') || name.includes('codebuff')) {
+      if (name.includes('screenpipe') || name.includes('epicenter') || name.includes('cocoindex') || name.includes('codebuff')) {
         return (
           <div className={`${uiScale.githubContainer} rounded-lg bg-stone-800 border-2 border-stone-700 flex items-center justify-center shadow-sm`}>
             <svg className={`${uiScale.githubIconSize} text-white`} fill="currentColor" viewBox="0 0 16 16">

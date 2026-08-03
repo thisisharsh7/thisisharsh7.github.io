@@ -226,10 +226,27 @@ export const filesystem = {
     {
       name: 'open-source',
       type: 'folder',
-      size: '3 items',
+      size: '4 items',
       modified: 'Apr 27, 2026',
       desktopPosition: { x: 22, y: 300 },
       children: [
+        {
+          name: 'screenpipe.md',
+          type: 'file',
+          size: '1.1 KB',
+          modified: 'Apr 27, 2026',
+          content: `<h2 class="text-2xl font-medium mb-6 text-stone-800">screenpipe</h2>
+
+<p class="text-sm text-stone-500 font-mono mb-6">YC S26 · 20,713 stars · May 2026 – Present</p>
+
+<p class="mb-4">Record your screen 24/7 and plug it into your agents. Local, private, secure.</p>
+
+<p class="mb-4">Ship features across chat, onboarding, Pipes, artifacts, timeline, and desktop UI. 100+ PRs merged.</p>
+
+<p class="mb-6">Work with the founder on product ideas and UI decisions. Fix bugs. Sharpen core workflows.</p>
+
+<a href="https://github.com/screenpipe/screenpipe" target="_blank" class="text-stone-600 hover:text-stone-800 text-sm underline">View project →</a>`
+        },
         {
           name: 'epicenter.md',
           type: 'file',
