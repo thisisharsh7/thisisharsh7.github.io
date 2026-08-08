@@ -5,8 +5,8 @@ export const filesystem = {
     {
       name: 'README.txt',
       type: 'file',
-      size: '856 B',
-      modified: 'Apr 27, 2026',
+      size: '1.2 KB',
+      modified: 'Aug 9, 2026',
       desktopPosition: { x: 20, y: 20 },
       content: `<p class="mb-4">I grew up in <a href="https://en.wikipedia.org/wiki/Bihar" target="_blank">Bihar, India</a>. Eldest of three siblings.</p>
 
@@ -14,11 +14,15 @@ export const filesystem = {
 
 <p class="mb-6">So I taught myself to code. Nights and weekends. Worked with five startups while still in college. Built frontends, backends, whatever they needed. Each one taught me something different.</p>
 
-<p class="mb-6">Graduated in 2025. No job lined up. So I kept building. Started contributing to open source. Six months later, found my way to <a href="https://github.com/EpicenterHQ" target="_blank">Epicenter</a> and <a href="https://github.com/topoteretes/cognee" target="_blank">Cognee</a>.</p>
+<p class="mb-6">Graduated in 2025. No job lined up. So I kept building. Started contributing to open source and eventually found my way to <a href="https://github.com/EpicenterHQ" target="_blank">Epicenter</a>, <a href="https://github.com/topoteretes/cognee" target="_blank">Cognee</a>, and <a href="https://github.com/mediar-ai/screenpipe" target="_blank">Screenpipe</a>.</p>
 
-<p class="mb-6">Not getting a traditional job turned out to be the best thing. Open source gave me something better — the chance to build things that matter.</p>
+<p class="mb-6">Not getting a traditional job turned out to be the best thing. Open source gave me the chance to work closely with startup teams, ship real software, and build things that matter.</p>
 
-<p class="mb-6">Now I maintain projects at Epicenter (YC S25) and build community at Cognee. I track issues. Submit PRs. Help shape roadmaps. Support developers. Work with React, TypeScript, Next.js, Node.js, Python — whatever solves the problem.</p>
+<p class="mb-6">I spent the last few months contributing to Screenpipe, an open-source YC startup, where I shipped 100+ PRs across the product — from UI/UX and onboarding to search, pipes, performance, and bug fixes.</p>
+
+<p class="mb-6">I also work with Cognee on community and product feedback — supporting developers, tracking issues, testing features, finding bugs, and helping improve the product.</p>
+
+<p class="mb-6">I contribute to open source and build little tools. I work mostly with React, TypeScript, Next.js, Node.js, Python, and Rust — whatever solves the problem.</p>
 
 <p class="mb-4">The files here show what I've built and what I'm working on.</p>
 
@@ -39,8 +43,8 @@ export const filesystem = {
     {
       name: 'now.md',
       type: 'file',
-      size: '3.1 KB',
-      modified: 'Apr 27, 2026',
+      size: '3.6 KB',
+      modified: 'Aug 9, 2026',
       desktopPosition: { x: 24, y: 115 },
       content: `<h2 class="text-2xl font-medium mb-6 text-stone-800">What I'm working on</h2>
 
@@ -232,14 +236,14 @@ export const filesystem = {
       name: 'open-source',
       type: 'folder',
       size: '4 items',
-      modified: 'Apr 27, 2026',
+      modified: 'Aug 3, 2026',
       desktopPosition: { x: 22, y: 300 },
       children: [
         {
           name: 'screenpipe.md',
           type: 'file',
           size: '1.1 KB',
-          modified: 'Apr 27, 2026',
+          modified: 'Aug 3, 2026',
           content: `<h2 class="text-2xl font-medium mb-6 text-stone-800">screenpipe</h2>
 
 <p class="text-sm text-stone-500 font-mono mb-6">YC S26 · 20,713 stars · May 2026 – Present</p>
