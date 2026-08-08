@@ -56,6 +56,11 @@ export const filesystem = {
 
 <h3 class="text-lg font-medium mb-6 text-stone-800 mt-10">Previously</h3>
 
+<p class="mb-4"><strong>screenpipe (YC S26)</strong><br/>
+<span class="text-sm text-stone-500">May 2026 – Aug 2026</span></p>
+
+<p class="mb-8">Software Engineer, open source. Shipped 100+ merged PRs across chat, onboarding, automations (Pipes), artifacts, timeline, and desktop UI. Built features, fixed bugs, improved core workflows. Worked directly with the founder on product ideas, UI decisions, and onboarding.</p>
+
 <p class="mb-4"><strong>Userology</strong><br/>
 <span class="text-sm text-stone-500">Aug 2024 – Jan 2025</span></p>
 
